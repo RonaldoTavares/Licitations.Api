@@ -1,4 +1,6 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Borders.UseCases;
+using Microsoft.Extensions.DependencyInjection;
+using UseCases;
 
 namespace Licitacao.api.Configurations
 {
@@ -6,7 +8,7 @@ namespace Licitacao.api.Configurations
     {
         public static void ConfigureServices(IServiceCollection services)
         {
-            //services.AddSingleton<IUseCase, UseCase>();
+            services.AddSingleton<IGetLicitationsUseCase, GetLicitationsUseCase>();
         }
     }
 }

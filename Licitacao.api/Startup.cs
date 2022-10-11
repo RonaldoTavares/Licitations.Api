@@ -1,4 +1,5 @@
 using Licitacao.api.Configurations;
+using Licitacao.api.Extensions;
 using Licitacao.api.Models;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -28,11 +29,13 @@ namespace Licitacao.api
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            var appliationConfig = Configuration.LoadConfiguration();
             services.AddControllers();
 
-            RepositoryConfig.ConfigureServices(services);
-            UseCaseConfig.ConfigureServices(services);
+            RepositoryConfig.ConfigureServices(services, appliationConfig);
+            UseCaseConfig.ConfigureServices(services, appliationConfig);
 
+            services.AddSingleton(appliationConfig);
             services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
             services.AddScoped<IActionResultConverter, ActionResultConverter>();

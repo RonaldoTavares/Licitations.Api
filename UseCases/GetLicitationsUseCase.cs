@@ -1,31 +1,30 @@
 ﻿using Borders.Entities;
 using Borders.Enums;
+using Borders.Repositories;
 using Borders.Shared;
 using Borders.UseCases;
 using HtmlAgilityPack;
 using Shared.Models;
 using System;
 using System.Collections.Generic;
-using System.Reflection.Metadata;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace UseCases
 {
     public class GetLicitationsUseCase : IGetLicitationsUseCase
     {
-        //private readonly irepo _repo;
+        private readonly ILicitationsRepository _licitationsRepository;
 
-        public GetLicitationsUseCase()
+        public GetLicitationsUseCase(ILicitationsRepository licitationsRepository)
         {
-            //_repo = repo;
+            _licitationsRepository = licitationsRepository;
         }
 
         public async Task<UseCaseResponse<List<Licitation>>> Execute()
         {
             try
             {
-                int lastLicitation = 2960;
+                int lastLicitation = 2770;
       
                 HtmlWeb  web = new();
 
@@ -53,6 +52,11 @@ namespace UseCases
                     }
 
                     lastLicitation++;
+                }
+
+                foreach (Licitation licitation in licitations)
+                {
+                    await _licitationsRepository.CreateLicitation(licitation);
                 }
 
                 return new UseCaseResponse<List<Licitation>>().SetResult(licitations);
@@ -93,26 +97,23 @@ namespace UseCases
             var valorOrcado = CutInformation("Valor Orçado: R$ ", "Data Abertura: ", corpo).Trim();
             var dataAbertura = CutInformation("Data Abertura: ", " às ", corpo).Trim();
 
-            decimal isDecimal = 0;
-
-            bool a = decimal.TryParse(valorOrcado, out isDecimal);
-
-            if (corpo.Equals(string.Empty) || objeto.Equals(string.Empty) || dataAbertura.Equals(string.Empty) || valorOrcado.Equals(string.Empty) || !decimal.TryParse(valorOrcado, out isDecimal))
+            if (corpo.Equals(string.Empty) || objeto.Equals(string.Empty) || dataAbertura.Equals(string.Empty) || valorOrcado.Equals(string.Empty) || !decimal.TryParse(valorOrcado, out _))
             {
                 return null;
             }
 
             var licitation = new Licitation()
             {
-                Id = Guid.NewGuid(),
-                Edital = edital,
-                Objeto = objeto,
-                Valor = Convert.ToDecimal(valorOrcado),
-                DataAbertura = DateTime.Parse(dataAbertura),
-                OrgaoName = "DER - DEPARTAMENTO DE EDIFICACOES E ESTRADAS DE RODAGEM DO ESTADO DE MINAS GERAIS",
-                OrgaoDocument = "17309790000194",
+                PkLicitation = Guid.NewGuid(),
+                Notice = edital,
+                Object = objeto,
+                Value = Convert.ToDecimal(valorOrcado),
+                OpeningDate = DateTime.Parse(dataAbertura),
+                OrganName = "DER - DEPARTAMENTO DE EDIFICACOES E ESTRADAS DE RODAGEM DO ESTADO DE MINAS GERAIS",
+                OrganDocument = "17309790000194",
                 Status = LicitationStatus.Open,
-                Link = link
+                Link = link,
+                CreateDate = DateTime.Now
             };
 
             return licitation;

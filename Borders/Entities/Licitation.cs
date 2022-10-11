@@ -5,14 +5,15 @@ namespace Borders.Entities
 {
     public class Licitation
     {
-        public Guid Id { get; set; }
-        public string Edital { get; set; }
-        public string Objeto { get; set; }
-        public string OrgaoName { get; set; }
-        public string OrgaoDocument { get; set; }
-        public decimal Valor { get; set; }
-        public DateTime DataAbertura { get; set; }
+        public Guid PkLicitation { get; set; }
+        public string Notice { get; set; }
+        public string Object { get; set; }
+        public string OrganName { get; set; }
+        public string OrganDocument { get; set; }
+        public decimal Value { get; set; }
+        public DateTime OpeningDate { get; set; }
         public LicitationStatus Status { get; set; }
         public string Link { get; set; }
+        public DateTime CreateDate { get; set; }
     }
 }

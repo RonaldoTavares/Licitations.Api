@@ -1,8 +1,12 @@
 ﻿using Borders.Entities;
+using Borders.Enums;
 using Borders.Helpers;
 using Borders.Repositories;
 using Dapper;
 using Repositories.SqlStatements;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Transactions;
 
@@ -30,6 +34,31 @@ namespace Repositories.Repositories
 
                 scope.Complete();
             }
+
+            return true;
+        }
+
+        public async Task<List<Licitation>> GetLicitationsByStatus(LicitationStatus request)
+        {
+            using var connection = _helper.GetConnection();
+            var parameters = new DynamicParameters();
+            var query = LicitationStatements.GET_LICITATION_BY_STATUS;
+            parameters.Add("@Status", request);
+
+            var response = await (connection.QueryAsync<Licitation>(query, parameters));
+
+            return response.ToList();
+        }
+
+        public async Task<bool> UpdateLicitationStatus(Guid id, LicitationStatus status)
+        {
+            using var connection = _helper.GetConnection();
+            var parameters = new DynamicParameters();
+            var query = LicitationStatements.UPDATE_LICITATION_STATUS_BY_ID;
+            parameters.Add("@Status", status);
+            parameters.Add("@PkLicitation", id);
+
+            var response = await (connection.QueryAsync<bool>(query, parameters));
 
             return true;
         }

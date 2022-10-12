@@ -4,16 +4,11 @@ using Licitacao.api.Models;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Licitacao.api
 {
@@ -34,6 +29,7 @@ namespace Licitacao.api
 
             RepositoryConfig.ConfigureServices(services, appliationConfig);
             UseCaseConfig.ConfigureServices(services, appliationConfig);
+            ServiceConfig.ConfigureServices(services, appliationConfig);
 
             services.AddSingleton(appliationConfig);
             services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();

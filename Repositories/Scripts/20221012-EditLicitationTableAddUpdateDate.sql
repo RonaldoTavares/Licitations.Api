@@ -1,0 +1,1 @@
+﻿ALTER TABLE licitations ADD update_date datetime;

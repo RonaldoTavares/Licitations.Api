@@ -1,10 +1,11 @@
 ﻿using Borders.Entities;
 using Borders.Enums;
+using Borders.Models;
 using Borders.Repositories;
+using Borders.Services;
 using Borders.Shared;
 using Borders.UseCases;
 using HtmlAgilityPack;
-using Shared.Models;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -13,10 +14,12 @@ namespace UseCases
 {
     public class GetLicitationsUseCase : IGetLicitationsUseCase
     {
+        private readonly ILicitationsService _licitationsService;
         private readonly ILicitationsRepository _licitationsRepository;
 
-        public GetLicitationsUseCase(ILicitationsRepository licitationsRepository)
+        public GetLicitationsUseCase(ILicitationsService licitationsService, ILicitationsRepository licitationsRepository)
         {
+            _licitationsService = licitationsService;
             _licitationsRepository = licitationsRepository;
         }
 
@@ -24,7 +27,7 @@ namespace UseCases
         {
             try
             {
-                int lastLicitation = 2770;
+                int lastLicitation = 2989;
       
                 HtmlWeb  web = new();
 
@@ -63,7 +66,7 @@ namespace UseCases
             }
             catch(Exception e)
             {
-                ErrorMessage errMsg = new ErrorMessage("", $"Unespected error closing lead. Error: {e.Message}");
+                ErrorMessage errMsg = new("", $"Unespected error closing lead. Error: {e.Message}");
                 return new UseCaseResponse<List<Licitation>>().SetInternalServerError(e.Message, new[] { errMsg });
             }
         }
@@ -74,28 +77,15 @@ namespace UseCases
             return result != null ?result[0].InnerText.Trim() : string.Empty;
         }
 
-        private static string CutInformation(string initial, string end, string text)
-        {
-            var initialPosition = text.IndexOf(initial) + initial.Length;
-            var endPosition = text.IndexOf(end) - initialPosition;
-
-            if(initialPosition > 0 && endPosition > 0)
-            {
-                return text.Substring(initialPosition, endPosition);
-            }
-
-            return "";
-        }
-
-        private static Licitation? GetLicitation(HtmlDocument document, string link)
+        private Licitation? GetLicitation(HtmlDocument document, string link)
         {
 
             var corpo = GetInformation(document, "//section[@class='article-content clearfix']//p");
 
             var edital = GetInformation(document, "//h1[@class='article-title']");
-            var objeto = CutInformation("Objeto: ", "Valor Orçado: ", corpo).Trim();
-            var valorOrcado = CutInformation("Valor Orçado: R$ ", "Data Abertura: ", corpo).Trim();
-            var dataAbertura = CutInformation("Data Abertura: ", " às ", corpo).Trim();
+            var objeto = _licitationsService.CutInformation("Objeto: ", "Valor Orçado: ", corpo).Trim();
+            var valorOrcado = _licitationsService.CutInformation("Valor Orçado: R$ ", "Data Abertura: ", corpo).Trim();
+            var dataAbertura = _licitationsService.CutInformation("Data Abertura: ", " às ", corpo).Trim();
 
             if (corpo.Equals(string.Empty) || objeto.Equals(string.Empty) || dataAbertura.Equals(string.Empty) || valorOrcado.Equals(string.Empty) || !decimal.TryParse(valorOrcado, out _))
             {

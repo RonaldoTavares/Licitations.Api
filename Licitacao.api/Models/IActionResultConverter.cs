@@ -1,8 +1,8 @@
-﻿using Borders.Shared;
+﻿using Borders.Models;
+using Borders.Shared;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Serilog;
-using Shared.Models;
 using System.Linq;
 
 namespace Licitacao.api.Models

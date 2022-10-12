@@ -1,4 +1,4 @@
-﻿using Shared.Models;
+﻿using Borders.Models;
 using System.Collections.Generic;
 
 namespace Borders.Shared

@@ -17,7 +17,7 @@ namespace Shared.Services
             var initialPosition = textUpper.IndexOf(initial.ToUpper());
             var endPosition = textUpper.IndexOf(end.ToUpper());
 
-            if (initialPosition > 0 && endPosition > 0)
+            if (initialPosition >= 0 && endPosition > 0)
             {
                 return text[(initialPosition + initial.Length)..endPosition];
             }

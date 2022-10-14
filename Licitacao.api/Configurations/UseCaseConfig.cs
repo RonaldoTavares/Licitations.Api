@@ -13,6 +13,7 @@ namespace Licitacao.api.Configurations
             services.AddSingleton<IGetjudgmentsUseCase, GetjudgmentsUseCase>();
             services.AddSingleton<IGetHomologationUseCase, GetHomologationUseCase>();
             services.AddSingleton<IGetClosedLicitations, GetClosedLicitations>();
+            services.AddSingleton<IGetLicitationsDERRJ, GetLicitationsDERRJ>();
         }
     }
 }

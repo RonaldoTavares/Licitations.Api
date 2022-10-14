@@ -15,18 +15,21 @@ namespace Licitacao.api.Controllers
         private readonly IGetjudgmentsUseCase _getjudgmentsUseCase;
         private readonly IGetHomologationUseCase _getHomologationUseCase;
         private readonly IGetClosedLicitations _getClosedLicitations;
+        private readonly IGetLicitationsDERRJ _getLicitationsDERRJ;
 
         public LicitationsController(IActionResultConverter actionResultConverter, 
             IGetLicitationsUseCase getLicitationsUseCase,
             IGetjudgmentsUseCase getjudgmentsUseCase,
             IGetHomologationUseCase getHomologationUseCase,
-            IGetClosedLicitations getClosedLicitations)
+            IGetClosedLicitations getClosedLicitations,
+            IGetLicitationsDERRJ getLicitationsDERRJ)
         {
             _actionResultConverter = actionResultConverter;
             _getLicitationsUseCase = getLicitationsUseCase;
             _getjudgmentsUseCase = getjudgmentsUseCase;
             _getHomologationUseCase = getHomologationUseCase;
             _getClosedLicitations = getClosedLicitations;
+            _getLicitationsDERRJ = getLicitationsDERRJ;
         }
 
         [HttpGet("Licitations")]
@@ -66,6 +69,16 @@ namespace Licitacao.api.Controllers
         {
 
             var response = await _getClosedLicitations.Execute();
+            return _actionResultConverter.Convert(response);
+        }
+
+        [HttpGet("Licitations/DER-RJ")]
+        [ProducesResponseType(200, Type = typeof(bool))]
+        [ProducesResponseType(500, Type = typeof(bool))]
+        public async Task<IActionResult> GetLicitationsDERRJ()
+        {
+
+            var response = await _getLicitationsDERRJ.Execute();
             return _actionResultConverter.Convert(response);
         }
     }

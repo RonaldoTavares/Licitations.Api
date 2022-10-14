@@ -25,7 +25,9 @@ namespace UseCases
         {
             try
             {
-                var licitations = await _licitationsRepository.GetLicitationsByStatus(LicitationStatus.judged);
+                var licitations2 = await _licitationsRepository.GetLicitationsByStatus(LicitationStatus.judged);
+                var licitations = new List<Licitation>();
+                licitations2.ForEach(licitation => { if (licitation.OrganDocument.Equals("17309790000194")) { licitations.Add(licitation); } });
 
                 List<string> constantsJudge = new()
                 {

@@ -14,5 +14,6 @@
         EndLicitationPage = 9,
         LinkWebPage = 10,  
         PositionArray = 11,
+        Judgment = 12,
     }
 }

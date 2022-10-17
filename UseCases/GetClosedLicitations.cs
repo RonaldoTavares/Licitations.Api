@@ -27,7 +27,7 @@ namespace UseCases
         {
             try
             {
-                var licitations = await _licitationsRepository.GetLicitationsByStatus(LicitationStatus.homologate);
+                var licitations = await _licitationsRepository.GetLicitationsByStatus(LicitationStatus.homologate, "");
                 List<string> constantsJudge = new()
                 {
                     "Extrato de contrato",

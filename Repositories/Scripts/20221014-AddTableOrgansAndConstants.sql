@@ -30,9 +30,12 @@ insert into search_constants(pk_search_constant, fk_organ, constant, type) value
 insert into search_constants(pk_search_constant, fk_organ, constant, type) values (NEWID(), '7375E9C4-5D74-4213-A78D-4A3462F03948', 'An error occurred on the server when processing the URL.', 9)
 insert into search_constants(pk_search_constant, fk_organ, constant, type) values (NEWID(), '7375E9C4-5D74-4213-A78D-4A3462F03948', 'https://www.der.rj.gov.br/licitacao_completo.asp?ident=', 10)
 insert into search_constants(pk_search_constant, fk_organ, constant, type) values (NEWID(), '7375E9C4-5D74-4213-A78D-4A3462F03948', '0', 11)
+insert into search_constants(pk_search_constant, fk_organ, constant, type) values (NEWID(), '7375E9C4-5D74-4213-A78D-4A3462F03948', 'JULGAMENTO DE HABILITACAO', 12)
+insert into search_constants(pk_search_constant, fk_organ, constant, type) values (NEWID(), '7375E9C4-5D74-4213-A78D-4A3462F03948', 'Julgamento_de_Habilitacao', 12)
 
 ALTER TABLE organs ADD last_licitation int NOT NULL DEFAULT 0;
 update organs set last_licitation = 1500 where pk_organ = '7375E9C4-5D74-4213-A78D-4A3462F03948'
+
 
 insert into organs(pk_organ, organ_name, organ_document, active, last_licitation) values ('8af68c2b-234a-438f-b869-b92bedaa5d6f', 'DER MG', '17309790000194',1, 2989)
 insert into search_constants(pk_search_constant, fk_organ, constant, type) values (NEWID(), '8af68c2b-234a-438f-b869-b92bedaa5d6f', '6', 11)
@@ -47,3 +50,6 @@ insert into search_constants(pk_search_constant, fk_organ, constant, type) value
 insert into search_constants(pk_search_constant, fk_organ, constant, type) values (NEWID(), '8af68c2b-234a-438f-b869-b92bedaa5d6f', '//article', 8)
 insert into search_constants(pk_search_constant, fk_organ, constant, type) values (NEWID(), '8af68c2b-234a-438f-b869-b92bedaa5d6f', 'An error occurred on the server when processing the URL.', 9)
 insert into search_constants(pk_search_constant, fk_organ, constant, type) values (NEWID(), '8af68c2b-234a-438f-b869-b92bedaa5d6f', 'http://www.der.mg.gov.br/', 10)
+insert into search_constants(pk_search_constant, fk_organ, constant, type) values (NEWID(), '8af68c2b-234a-438f-b869-b92bedaa5d6f', 'Julgamento de Proposta de Preços', 12)
+insert into search_constants(pk_search_constant, fk_organ, constant, type) values (NEWID(), '8af68c2b-234a-438f-b869-b92bedaa5d6f', 'Julgamento de Licitação', 12)
+insert into search_constants(pk_search_constant, fk_organ, constant, type) values (NEWID(), '8af68c2b-234a-438f-b869-b92bedaa5d6f', 'Julgamento Proposta de Preços', 12)

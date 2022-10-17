@@ -9,7 +9,7 @@ namespace Borders.Repositories
     public interface ILicitationsRepository
     {
         Task<bool> CreateLicitation(Licitation request);
-        Task<List<Licitation>> GetLicitationsByStatus(LicitationStatus request);
+        Task<List<Licitation>> GetLicitationsByStatus(LicitationStatus request, string document);
         Task<bool> UpdateLicitationStatus(Guid id, LicitationStatus status);
     };
 }

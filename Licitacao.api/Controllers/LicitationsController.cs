@@ -11,35 +11,22 @@ namespace Licitacao.api.Controllers
     public class LicitationsController : Controller
     {
         private readonly IActionResultConverter _actionResultConverter;
-        private readonly IGetLicitationsUseCase _getLicitationsUseCase;
         private readonly IGetjudgmentsUseCase _getjudgmentsUseCase;
         private readonly IGetHomologationUseCase _getHomologationUseCase;
         private readonly IGetClosedLicitations _getClosedLicitations;
         private readonly IGetLicitationsDERRJ _getLicitationsDERRJ;
 
         public LicitationsController(IActionResultConverter actionResultConverter, 
-            IGetLicitationsUseCase getLicitationsUseCase,
             IGetjudgmentsUseCase getjudgmentsUseCase,
             IGetHomologationUseCase getHomologationUseCase,
             IGetClosedLicitations getClosedLicitations,
             IGetLicitationsDERRJ getLicitationsDERRJ)
         {
             _actionResultConverter = actionResultConverter;
-            _getLicitationsUseCase = getLicitationsUseCase;
             _getjudgmentsUseCase = getjudgmentsUseCase;
             _getHomologationUseCase = getHomologationUseCase;
             _getClosedLicitations = getClosedLicitations;
             _getLicitationsDERRJ = getLicitationsDERRJ;
-        }
-
-        [HttpGet("Licitations")]
-        [ProducesResponseType(200, Type = typeof(bool))]
-        [ProducesResponseType(500, Type = typeof(bool))]
-        public async Task<IActionResult> GetLicitations()
-        {
-
-            var response = await _getLicitationsUseCase.Execute();
-            return _actionResultConverter.Convert(response);
         }
 
         [HttpGet("Licitations/judgment")]
@@ -72,7 +59,7 @@ namespace Licitacao.api.Controllers
             return _actionResultConverter.Convert(response);
         }
 
-        [HttpGet("Licitations/DER-RJ")]
+        [HttpGet("Licitations")]
         [ProducesResponseType(200, Type = typeof(bool))]
         [ProducesResponseType(500, Type = typeof(bool))]
         public async Task<IActionResult> GetLicitationsDERRJ()

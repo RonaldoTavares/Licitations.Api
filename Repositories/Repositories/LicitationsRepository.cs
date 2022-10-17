@@ -38,12 +38,13 @@ namespace Repositories.Repositories
             return true;
         }
 
-        public async Task<List<Licitation>> GetLicitationsByStatus(LicitationStatus request)
+        public async Task<List<Licitation>> GetLicitationsByStatus(LicitationStatus request, string document)
         {
             using var connection = _helper.GetConnection();
             var parameters = new DynamicParameters();
             var query = LicitationStatements.GET_LICITATION_BY_STATUS;
             parameters.Add("@Status", request);
+            parameters.Add("@Document", document);
 
             var response = await (connection.QueryAsync<Licitation>(query, parameters));
 

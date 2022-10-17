@@ -47,7 +47,8 @@
 		FROM 
 			licitations 
 		WHERE 
-			status = @Status
+			status = @Status and
+			organ_document = @Document
 		";
 
 		public const string UPDATE_LICITATION_STATUS_BY_ID = @"

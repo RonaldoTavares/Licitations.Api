@@ -13,6 +13,9 @@ namespace Licitacao.api.Configurations
         {
             services.AddSingleton<IRepositoryHelper, RepositoryHelper>();
             services.AddSingleton<ILicitationsRepository, LicitationsRepository>();
+            services.AddSingleton<ISearchConstantsRepository, SearchConstantsRepository>();
+            services.AddSingleton<IOrgansRepository, OrgansRepository>();
+
         }
     }
 }

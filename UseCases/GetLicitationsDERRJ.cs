@@ -8,6 +8,7 @@ using Borders.UseCases;
 using HtmlAgilityPack;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace UseCases
@@ -16,50 +17,61 @@ namespace UseCases
     {
         private readonly ILicitationsService _licitationsService;
         private readonly ILicitationsRepository _licitationsRepository;
+        private readonly ISearchConstantsRepository _searchConstantsRepository;
+        private readonly IOrgansRepository _organsRepository;
 
-        public GetLicitationsDERRJ(ILicitationsService licitationsService, ILicitationsRepository licitationsRepository)
+        public GetLicitationsDERRJ(ILicitationsService licitationsService, ILicitationsRepository licitationsRepository, ISearchConstantsRepository searchConstantsRepository, IOrgansRepository organsRepository)
         {
             _licitationsService = licitationsService;
             _licitationsRepository = licitationsRepository;
+            _searchConstantsRepository = searchConstantsRepository;
+            _organsRepository = organsRepository;
         }
 
         public async Task<UseCaseResponse<bool>> Execute()
         {
             try
             {
-                int lastLicitation = 1500;
-                bool validLink = true;
-                int runFind = 3;
+                var organs = await _organsRepository.GetActiveOrgans();
 
-                HtmlWeb web = new();
-
-                var licitations = new List<Licitation>();
-
-                while (validLink || runFind > 0)
+                foreach (Organ organ in organs)
                 {
-                    var link = $"https://www.der.rj.gov.br/licitacao_completo.asp?ident={lastLicitation}";
-                    HtmlDocument document = web.Load(link);
+                    var constants = await _searchConstantsRepository.GetConstantsByDocumentOrgan(organ.OrganDocument);
+                    var lastLicitation = organ.LastLicitation;
+                    var licitations = new List<Licitation>();
+                    var web = new HtmlWeb();
 
-                     validLink = GetValidLink("//body", document);
+                    var validLink = true;
+                    var runFind = 3;
 
-                    if (validLink)
+                    while (validLink || runFind > 0)
                     {
-                        runFind = 3;
-                        var licitation = GetLicitation("//body", link, document);
-                        if (licitation != null)
-                            licitations.Add(licitation);
+                        var link = $"{constants.First(constant => constant.Type.Equals(SearchConstants.LinkWebPage)).Constant}{lastLicitation}";
+                        HtmlDocument document = web.Load(link);
+
+                        validLink = _licitationsService.GetValidLink(document, constants);
+
+                        if (validLink)
+                        {
+                            runFind = 3;
+                            var licitation = _licitationsService.GetLicitation(link, document, constants, organ);
+                            if (licitation != null)
+                                licitations.Add(licitation);
+                        }
+                        else
+                        {
+                            runFind--;
+                        }
+
+                        lastLicitation++;
                     }
-                    else
+
+                    foreach (Licitation licitation in licitations)
                     {
-                        runFind--;
+                        await _licitationsRepository.CreateLicitation(licitation);
                     }
 
-                    lastLicitation++;
-                }
-
-                foreach (Licitation licitation in licitations)
-                {
-                    await _licitationsRepository.CreateLicitation(licitation);
+                    await _organsRepository.UpdateLastLicitation(organ.OrganDocument, lastLicitation - 3);
                 }
 
                 return new UseCaseResponse<bool>().SetResult(true);
@@ -69,64 +81,6 @@ namespace UseCases
                 ErrorMessage errMsg = new("", $"Unespected error closing lead. Error: {e.Message}");
                 return new UseCaseResponse<bool>().SetInternalServerError(e.Message, new[] { errMsg });
             }
-        }
-
-        public string CutLastText(string initial, string text)
-        {
-            var textUpper = text.ToUpper();
-            var textCount = text.Length;
-            var initialPosition = textUpper.IndexOf(initial.ToUpper());
-
-            if (initialPosition > 0)
-            {
-                return text[(initialPosition)..(textCount)];
-            }
-
-            return "";
-        }
-
-        private bool GetValidLink(string htmlSection, HtmlDocument document)
-        {
-            var result = document.DocumentNode.SelectNodes(htmlSection);
-            var textInformation = result[0].InnerText.Replace("&nbsp;", " ");
-            textInformation = CutLastText("An error occurred on the server when processing the URL.", textInformation);
-
-            return textInformation.Equals(String.Empty);
-        }
-
-        private Licitation? GetLicitation(string htmlSection, string link, HtmlDocument document)
-        {
-            var result = document.DocumentNode.SelectNodes(htmlSection);
-            var textInformation = result[0].InnerText.Replace("&nbsp;", " ");
-            textInformation = CutLastText("REF: ", textInformation);
-            var edital = _licitationsService.CutInformation("REF: ", "TIPO: ", textInformation).Trim();
-            textInformation = CutLastText("OBJETO: ", textInformation);
-            var objeto = _licitationsService.CutInformation("OBJETO: ", "ORÇAMENTO OFICIAL: ", textInformation).Trim();
-            textInformation = CutLastText("ORÇAMENTO OFICIAL: R$ ", textInformation);
-            var valorOrcado = _licitationsService.CutInformation("ORÇAMENTO OFICIAL: R$ ", " (", textInformation).Trim();
-            textInformation = CutLastText("DATA DA LICITAÇÃO: ", textInformation);
-            var dataAbertura = _licitationsService.CutInformation("DATA DA LICITAÇÃO: ", " às", textInformation).Trim();
-
-            if (edital.Equals(string.Empty) || objeto.Equals(string.Empty) || valorOrcado.Equals(string.Empty) || dataAbertura.Equals(string.Empty))
-            {
-                return null;
-            }
-
-            var licitation = new Licitation()
-            {
-                PkLicitation = Guid.NewGuid(),
-                Notice = edital,
-                Object = objeto,
-                Value = Convert.ToDecimal(valorOrcado),
-                OpeningDate = DateTime.Parse(dataAbertura),
-                OrganName = "DER RJ",
-                OrganDocument = "28521870000125",
-                Status = LicitationStatus.Open,
-                Link = link,
-                CreateDate = DateTime.Now
-            };
-
-            return licitation;
         }
     }
 }

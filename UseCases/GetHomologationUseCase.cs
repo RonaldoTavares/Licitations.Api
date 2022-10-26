@@ -5,42 +5,71 @@ using Borders.Repositories;
 using Borders.Services;
 using Borders.Shared;
 using Borders.UseCases;
+using HtmlAgilityPack;
+using Repositories.Repositories;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace UseCases
 {
     public class GetHomologationUseCase : IGetHomologationUseCase
     {
-        private readonly ILicitationsService _licitationsService;
         private readonly ILicitationsRepository _licitationsRepository;
-        public GetHomologationUseCase(ILicitationsService licitationsService, ILicitationsRepository licitationsRepository)
+        private readonly IOrgansRepository _organsRepository;
+        private readonly ISearchConstantsRepository _searchConstantsRepository;
+
+        public GetHomologationUseCase(ILicitationsRepository licitationsRepository, IOrgansRepository organsRepository, ISearchConstantsRepository searchConstantsRepository)
         {
-            _licitationsService = licitationsService;
             _licitationsRepository = licitationsRepository;
+            _organsRepository = organsRepository;
+            _searchConstantsRepository = searchConstantsRepository;
         }
 
         public async Task<UseCaseResponse<bool>> Execute()
         {
             try
             {
-                var licitations2 = await _licitationsRepository.GetLicitationsByStatus(LicitationStatus.judged, "");
-                var licitations = new List<Licitation>();
-                licitations2.ForEach(licitation => { if (licitation.OrganDocument.Equals("17309790000194")) { licitations.Add(licitation); } });
+                var organs = await _organsRepository.GetActiveOrgans();
 
-                List<string> constantsJudge = new()
+                foreach (Organ organ in organs)
                 {
-                    "Aviso de Homologação"
-                };
+                    var constants = await _searchConstantsRepository.GetConstantsByDocumentOrgan(organ.OrganDocument);
+                    var licitations = await _licitationsRepository.GetLicitationsByStatus(LicitationStatus.judged, organ.OrganDocument);
+                    var web = new HtmlWeb();
 
-                foreach (Licitation licitation in licitations)
-                {
-                    var a = _licitationsService.GetDocumentLink("//a[@class='dropfiles_downloadlink']", constantsJudge, licitation.Link);
-
-                    if (!a.Equals(string.Empty))
+                    foreach (Licitation licitation in licitations)
                     {
-                       await _licitationsRepository.UpdateLicitationStatus(licitation.PkLicitation, LicitationStatus.homologate);
+                        HtmlDocument document = web.Load(licitation.Link);
+
+                        var result = document.DocumentNode.SelectNodes(constants.First(constant => constant.Type.Equals(SearchConstants.HtmlSection)).Constant);
+                        var textInformation = result[Convert.ToInt32(constants.First(constant => constant.Type.Equals(SearchConstants.PositionArray)).Constant)].InnerText.Replace("&nbsp;", " ");
+
+                        var homologationConstants = new List<SearchConstant>();
+
+                        constants.ForEach(constant =>
+                        {
+                            if (constant.Type.Equals(SearchConstants.Homologation))
+                            {
+                                homologationConstants.Add(constant);
+                            }
+                        });
+
+                        var homologate = false;
+
+                        foreach (SearchConstant constant in homologationConstants)
+                        {
+                            if (textInformation.ToUpper().Contains(constant.Constant.ToUpper(), StringComparison.CurrentCulture))
+                            {
+                                homologate = true;
+                            }
+                        }
+
+                        if (homologate)
+                        {
+                            await _licitationsRepository.UpdateLicitationStatus(licitation.PkLicitation, LicitationStatus.homologate);
+                        }
                     }
                 }
 

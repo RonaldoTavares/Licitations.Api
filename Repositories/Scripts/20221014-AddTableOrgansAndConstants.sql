@@ -40,7 +40,7 @@ update organs set last_licitation = 1500 where pk_organ = '7375E9C4-5D74-4213-A7
 insert into organs(pk_organ, organ_name, organ_document, active, last_licitation) values ('8af68c2b-234a-438f-b869-b92bedaa5d6f', 'DER MG', '17309790000194',1, 2989)
 insert into search_constants(pk_search_constant, fk_organ, constant, type) values (NEWID(), '8af68c2b-234a-438f-b869-b92bedaa5d6f', '6', 11)
 insert into search_constants(pk_search_constant, fk_organ, constant, type) values (NEWID(), '8af68c2b-234a-438f-b869-b92bedaa5d6f', 'edital ', 6)
-insert into search_constants(pk_search_constant, fk_organ, constant, type) values (NEWID(), '8af68c2b-234a-438f-b869-b92bedaa5d6f', ' Detalhes', 7)
+insert into search_constants(pk_search_constant, fk_organ, constant, type) values (NEWID(), '8af68c2b-234a-438f-b869-b92bedaa5d6f', 'Detalhes', 7)
 insert into search_constants(pk_search_constant, fk_organ, constant, type) values (NEWID(), '8af68c2b-234a-438f-b869-b92bedaa5d6f', 'Objeto: ', 2)
 insert into search_constants(pk_search_constant, fk_organ, constant, type) values (NEWID(), '8af68c2b-234a-438f-b869-b92bedaa5d6f', 'Valor Orçado: ', 3)
 insert into search_constants(pk_search_constant, fk_organ, constant, type) values (NEWID(), '8af68c2b-234a-438f-b869-b92bedaa5d6f', 'Valor Orçado: R$ ', 0)
@@ -53,3 +53,8 @@ insert into search_constants(pk_search_constant, fk_organ, constant, type) value
 insert into search_constants(pk_search_constant, fk_organ, constant, type) values (NEWID(), '8af68c2b-234a-438f-b869-b92bedaa5d6f', 'Julgamento de Proposta de Preços', 12)
 insert into search_constants(pk_search_constant, fk_organ, constant, type) values (NEWID(), '8af68c2b-234a-438f-b869-b92bedaa5d6f', 'Julgamento de Licitação', 12)
 insert into search_constants(pk_search_constant, fk_organ, constant, type) values (NEWID(), '8af68c2b-234a-438f-b869-b92bedaa5d6f', 'Julgamento Proposta de Preços', 12)
+
+insert into search_constants values (NEWID(), '8AF68C2B-234A-438F-B869-B92BEDAA5D6F','Homologação',13)
+insert into search_constants values (NEWID(), '7375E9C4-5D74-4213-A78D-4A3462F03948','HOMOLOGO_E_ADJUDICO',13)
+insert into search_constants values (NEWID(), '7375E9C4-5D74-4213-A78D-4A3462F03948','Publicação Homologação',13)
+insert into search_constants values (NEWID(), '8AF68C2B-234A-438F-B869-B92BEDAA5D6F','Abertura propostas de preços',12)

@@ -15,5 +15,6 @@
         LinkWebPage = 10,  
         PositionArray = 11,
         Judgment = 12,
+        Homologation = 13,
     }
 }

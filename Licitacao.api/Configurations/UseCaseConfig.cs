@@ -9,10 +9,7 @@ namespace Licitacao.api.Configurations
     {
         public static void ConfigureServices(IServiceCollection services, ApplicationConfig applicationConfig)
         {
-            services.AddSingleton<IGetjudgmentsUseCase, GetjudgmentsUseCase>();
             services.AddSingleton<IGetHomologationUseCase, GetHomologationUseCase>();
-            services.AddSingleton<IGetClosedLicitations, GetClosedLicitations>();
-            services.AddSingleton<IGetLicitationsDERRJ, GetLicitationsDERRJ>();
         }
     }
 }

@@ -29,7 +29,6 @@ namespace Licitacao.api
 
             RepositoryConfig.ConfigureServices(services, appliationConfig);
             UseCaseConfig.ConfigureServices(services, appliationConfig);
-            ServiceConfig.ConfigureServices(services, appliationConfig);
 
             services.AddSingleton(appliationConfig);
             services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
@@ -60,7 +59,7 @@ namespace Licitacao.api
                 app.UseHsts();
             }
 
-            
+
             app.UseSwagger();
             app.UseSwagger(swagger =>
             {

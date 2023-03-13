@@ -12,10 +12,7 @@ namespace Licitacao.api.Configurations
         public static void ConfigureServices(IServiceCollection services, ApplicationConfig applicationConfig)
         {
             services.AddSingleton<IRepositoryHelper, RepositoryHelper>();
-            services.AddSingleton<ILicitationsRepository, LicitationsRepository>();
-            services.AddSingleton<ISearchConstantsRepository, SearchConstantsRepository>();
-            services.AddSingleton<IOrgansRepository, OrgansRepository>();
-
+            services.AddSingleton<ILicitationsLinkRepository, LicitationsLinkRepository>();
         }
     }
 }

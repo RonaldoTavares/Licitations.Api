@@ -12,4 +12,8 @@
     <ProjectReference Include="..\Borders\Borders.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Services\" />
+  </ItemGroup>
+
 </Project>

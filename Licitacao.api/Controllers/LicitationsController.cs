@@ -1,7 +1,7 @@
-﻿using Borders.Shared;
-using Borders.UseCases;
+﻿using Borders.UseCases;
 using Licitacao.api.Models;
 using Microsoft.AspNetCore.Mvc;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Licitacao.api.Controllers
@@ -11,61 +11,21 @@ namespace Licitacao.api.Controllers
     public class LicitationsController : Controller
     {
         private readonly IActionResultConverter _actionResultConverter;
-        private readonly IGetjudgmentsUseCase _getjudgmentsUseCase;
         private readonly IGetHomologationUseCase _getHomologationUseCase;
-        private readonly IGetClosedLicitations _getClosedLicitations;
-        private readonly IGetLicitationsDERRJ _getLicitationsDERRJ;
 
         public LicitationsController(IActionResultConverter actionResultConverter, 
-            IGetjudgmentsUseCase getjudgmentsUseCase,
-            IGetHomologationUseCase getHomologationUseCase,
-            IGetClosedLicitations getClosedLicitations,
-            IGetLicitationsDERRJ getLicitationsDERRJ)
+            IGetHomologationUseCase getHomologationUseCase)
         {
             _actionResultConverter = actionResultConverter;
-            _getjudgmentsUseCase = getjudgmentsUseCase;
             _getHomologationUseCase = getHomologationUseCase;
-            _getClosedLicitations = getClosedLicitations;
-            _getLicitationsDERRJ = getLicitationsDERRJ;
         }
 
-        [HttpGet("Licitations/judgment")]
-        [ProducesResponseType(200, Type = typeof(bool))]
-        [ProducesResponseType(500, Type = typeof(bool))]
-        public async Task<IActionResult> GetJudgment()
+        [HttpGet("Licitations/Atualizacoes")]
+        [ProducesResponseType(200, Type = typeof(List<string>))]
+        [ProducesResponseType(500, Type = typeof(List<string>))]
+        public async Task<IActionResult> GetHomologation(string date)
         {
-
-            var response = await _getjudgmentsUseCase.Execute();
-            return _actionResultConverter.Convert(response);
-        }
-
-        [HttpGet("Licitations/homologation")]
-        [ProducesResponseType(200, Type = typeof(bool))]
-        [ProducesResponseType(500, Type = typeof(bool))]
-        public async Task<IActionResult> GetHomologation()
-        {
-
-            var response = await _getHomologationUseCase.Execute();
-            return _actionResultConverter.Convert(response);
-        }
-
-        [HttpGet("Licitations/closed")]
-        [ProducesResponseType(200, Type = typeof(bool))]
-        [ProducesResponseType(500, Type = typeof(bool))]
-        public async Task<IActionResult> GetClosed()
-        {
-
-            var response = await _getClosedLicitations.Execute();
-            return _actionResultConverter.Convert(response);
-        }
-
-        [HttpGet("Licitations")]
-        [ProducesResponseType(200, Type = typeof(bool))]
-        [ProducesResponseType(500, Type = typeof(bool))]
-        public async Task<IActionResult> GetLicitationsDERRJ()
-        {
-
-            var response = await _getLicitationsDERRJ.Execute();
+            var response = await _getHomologationUseCase.Execute(date);
             return _actionResultConverter.Convert(response);
         }
     }

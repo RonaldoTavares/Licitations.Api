@@ -2,7 +2,6 @@
 using Borders.Enums;
 using Borders.Models;
 using Borders.Repositories;
-using Borders.Services;
 using Borders.Shared;
 using Borders.UseCases;
 using HtmlAgilityPack;
@@ -16,69 +15,41 @@ namespace UseCases
 {
     public class GetHomologationUseCase : IGetHomologationUseCase
     {
-        private readonly ILicitationsRepository _licitationsRepository;
-        private readonly IOrgansRepository _organsRepository;
-        private readonly ISearchConstantsRepository _searchConstantsRepository;
+        private readonly ILicitationsLinkRepository _licitationsRepository;
 
-        public GetHomologationUseCase(ILicitationsRepository licitationsRepository, IOrgansRepository organsRepository, ISearchConstantsRepository searchConstantsRepository)
+        public GetHomologationUseCase(ILicitationsLinkRepository licitationsRepository)
         {
             _licitationsRepository = licitationsRepository;
-            _organsRepository = organsRepository;
-            _searchConstantsRepository = searchConstantsRepository;
         }
 
-        public async Task<UseCaseResponse<bool>> Execute()
+        public async Task<UseCaseResponse<List<string>>> Execute(string date)
         {
             try
             {
-                var organs = await _organsRepository.GetActiveOrgans();
+                var licitations = await _licitationsRepository.GetLicitationsLinksByStatus(LicitationLinkStatus.Ativo);
 
-                foreach (Organ organ in organs)
+                var web = new HtmlWeb();
+                var response = new List<string>();
+                var serchText = date == string.Empty || date == null ? DateTime.Now.ToString("dd/MM/yyyy") : date;
+
+                foreach (LicitationLink licitation in licitations)
                 {
-                    var constants = await _searchConstantsRepository.GetConstantsByDocumentOrgan(organ.OrganDocument);
-                    var licitations = await _licitationsRepository.GetLicitationsByStatus(LicitationStatus.judged, organ.OrganDocument);
-                    var web = new HtmlWeb();
+                    HtmlDocument document = web.Load(licitation.Link);
 
-                    foreach (Licitation licitation in licitations)
+                    var result = document.DocumentNode.InnerText;
+
+                    if (result.Contains(serchText))
                     {
-                        HtmlDocument document = web.Load(licitation.Link);
-
-                        var result = document.DocumentNode.SelectNodes(constants.First(constant => constant.Type.Equals(SearchConstants.HtmlSection)).Constant);
-                        var textInformation = result[Convert.ToInt32(constants.First(constant => constant.Type.Equals(SearchConstants.PositionArray)).Constant)].InnerText.Replace("&nbsp;", " ");
-
-                        var homologationConstants = new List<SearchConstant>();
-
-                        constants.ForEach(constant =>
-                        {
-                            if (constant.Type.Equals(SearchConstants.Homologation))
-                            {
-                                homologationConstants.Add(constant);
-                            }
-                        });
-
-                        var homologate = false;
-
-                        foreach (SearchConstant constant in homologationConstants)
-                        {
-                            if (textInformation.ToUpper().Contains(constant.Constant.ToUpper(), StringComparison.CurrentCulture))
-                            {
-                                homologate = true;
-                            }
-                        }
-
-                        if (homologate)
-                        {
-                            await _licitationsRepository.UpdateLicitationStatus(licitation.PkLicitation, LicitationStatus.homologate);
-                        }
+                        response.Add(licitation.Link);
                     }
                 }
 
-                return new UseCaseResponse<bool>().SetResult(true);
+                return new UseCaseResponse<List<string>>().SetResult(response);
             }
             catch (Exception e)
             {
                 ErrorMessage errMsg = new("", $"Unespected error. Error: {e.Message}");
-                return new UseCaseResponse<bool>().SetInternalServerError(e.Message, new[] { errMsg });
+                return new UseCaseResponse<List<string>>().SetInternalServerError(e.Message, new[] { errMsg });
             }
         }
     }
